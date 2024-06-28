@@ -1,0 +1,255 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+      <link rel="stylesheet" type="text/css" href="style.css" />
+   </head>
+   <body onload="if (top.frames['componentsframe'] == undefined) { s = window.location.toString(); window.location = 'index.html?p=' + s.substring(s.lastIndexOf('/')+1); }">
+<h2 class="comptitle">Compound Module <i>Node</i></h2>
+<b>Package:</b> default<br/><b>File: <a href="Node.ned.html">Node.ned</a></b><br/>
+<p>An user node in the network of users. Encapsules message handler, routers and link queues.</p>
+<h3 class="subtitle">Networks:</h3>
+<table class="typestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="description">Description</th>
+   </tr>
+<tr>
+   <td>
+<a href="RandomGraph.html">RandomGraph</a>
+   </td>
+   <td>
+<i>network</i>
+   </td>
+   <td>
+
+<p>The whole network comprising of user nodes and links, controller</p>
+
+   </td>
+</tr>
+</table>
+<h3 class="subtitle">Parameters:</h3>
+<table class="paramstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="defaultvalue">Default value</th>
+      <th class="description">Description</th>
+   </tr>
+<tr class="local">
+   <td>address</td>
+   <td>
+      <i>int</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>n</td>
+   <td>
+      <i>int</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>linkCapacity</td>
+   <td>
+      <i>int</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>appType</td>
+   <td>
+      <i>string</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>TotalnumberOfSlot</td>
+   <td>
+      <i>int</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>Traffic_Class</td>
+   <td>
+      <i>int</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>Slot_Duration</td>
+   <td>
+      <i>double</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>lambda</td>
+   <td>
+      <i>double</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>source_node</td>
+   <td>
+      <i>int</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>destination_node</td>
+   <td>
+      <i>int</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+<tr class="local">
+   <td>packetSize</td>
+   <td>
+      <i>double</i>
+   </td>
+   <td></td>
+   <td>   </td>
+</tr>
+</table>
+<h3 class="subtitle">Properties:</h3>
+<table class="propertiestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="value">Value</th>
+      <th class="description">Description</th>
+   </tr>
+<tr>
+   <td>display</td>
+   <td><i>i=old/x_blank,green,10</i></td>
+   <td>
+<p>double trustProbability; //<a href="Node.html">Node</a> trust probability</p>
+</td>
+</tr>
+</table>
+<h3 class="subtitle">Gates:</h3>
+<table class="gatestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Direction</th>
+      <th class="gatesize">Size</th>
+      <th class="description">Description</th>
+   </tr>
+<tr class="local">
+   <td>port [ ]</xsl:if></td>
+   <td><i>inout</i></td>
+   <td></td>   <td></td>
+</tr>
+</table>
+<h3 class="subtitle">Unassigned submodule parameters:</h3>
+<table class="deepparamstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="defaultvalue">Default value</th>
+      <th class="description">Description</th>
+   </tr>
+<tr>
+   <td><a href="App.html">app</a>.packetLength</td>
+   <td>
+      <i>int</i>
+   </td>
+   <td></td>
+   <td>
+<p>length of one message (fixed! no "volatile" modifier)</p>
+   </td>
+</tr>
+<tr>
+   <td><a href="L2Queue.html">queue</a>.useCutThroughSwitching</td>
+   <td>
+      <i>bool</i>
+   </td>
+   <td>false</td>
+   <td>
+<p>use cut-through switching instead of store-and-forward</p>
+   </td>
+</tr>
+</table>
+<h3 class="subtitle">Source code:</h3>
+<pre class="src"><span style="color: #808080; font-style: italic; ">// An user node in the network of users. Encapsules message handler, routers and link queues.
+//
+</span><span style="color: #800000; font-weight: bold; ">module</span><span style="color: #000000; "> </span><span style="color: #000000; ">Node</span><span style="color: #000000; ">
+{
+    </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #000000; ">:
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">address</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">n</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">linkCapacity</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">string</span><span style="color: #000000; "> </span><span style="color: #000000; ">appType</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">Traffic_Class</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #000000; "> </span><span style="color: #000000; ">Slot_Duration</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #000000; "> </span><span style="color: #000000; ">lambda</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">source_node</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">destination_node</span><span style="color: #000000; ">;
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #000000; "> </span><span style="color: #000000; ">packetSize</span><span style="color: #000000; ">;
+        </span><span style="color: #808080; font-style: italic; ">//double trustProbability; //Node trust probability
+</span><span style="color: #000000; ">        </span><span style="color: #000000; font-weight: bold; ">@display</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;i=old/x_blank,green,10&quot;</span><span style="color: #000000; ">);
+    </span><span style="color: #800000; font-weight: bold; ">gates</span><span style="color: #000000; ">:
+        </span><span style="color: #000080; font-weight: bold; ">inout</span><span style="color: #000000; "> </span><span style="color: #000000; ">port</span><span style="color: #000000; ">[];
+    </span><span style="color: #800000; font-weight: bold; ">submodules</span><span style="color: #000000; ">:
+        </span><span style="color: #808080; font-style: italic; ">//      app: &lt;appType&gt; like IApp {
+</span><span style="color: #000000; ">        </span><span style="color: #000000; ">app</span><span style="color: #000000; ">: </span><span style="color: #000000; ">App</span><span style="color: #000000; "> {
+            </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #000000; ">:
+                </span><span style="color: #000000; ">address</span><span style="color: #000000; "> = </span><span style="color: #000000; ">address</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">n</span><span style="color: #000000; "> = </span><span style="color: #000000; ">n</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">packetSize</span><span style="color: #000000; "> = </span><span style="color: #000000; ">packetSize</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; "> = </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">Traffic_Class</span><span style="color: #000000; "> = </span><span style="color: #000000; ">Traffic_Class</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">timeSlot</span><span style="color: #000000; "> = </span><span style="color: #000000; ">Slot_Duration</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">lambda</span><span style="color: #000000; "> = </span><span style="color: #000000; ">lambda</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">source_node</span><span style="color: #000000; "> = </span><span style="color: #000000; ">source_node</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">destination_node</span><span style="color: #000000; "> = </span><span style="color: #000000; ">destination_node</span><span style="color: #000000; ">;
+                </span><span style="color: #808080; font-style: italic; ">//  packetLength = packetLength;
+</span><span style="color: #000000; ">                </span><span style="color: #808080; font-style: italic; ">//           numOfNodes = numOfNodes;
+</span><span style="color: #000000; ">                </span><span style="color: #000000; font-weight: bold; ">@display</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;p=140,60&quot;</span><span style="color: #000000; ">);
+        }
+
+        </span><span style="color: #000000; ">routing</span><span style="color: #000000; ">: </span><span style="color: #000000; ">Routing</span><span style="color: #000000; "> {
+            </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #000000; ">:
+                </span><span style="color: #000000; font-weight: bold; ">@display</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;p=140,130&quot;</span><span style="color: #000000; ">);
+                </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; "> = </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">timeSlot</span><span style="color: #000000; "> = </span><span style="color: #000000; ">Slot_Duration</span><span style="color: #000000; ">;
+            </span><span style="color: #800000; font-weight: bold; ">gates</span><span style="color: #000000; ">:
+                </span><span style="color: #000000; ">in</span><span style="color: #000000; ">[</span><span style="color: #800000; font-weight: bold; ">sizeof</span><span style="color: #000000; ">(</span><span style="color: #000000; ">port</span><span style="color: #000000; ">)];
+                </span><span style="color: #000000; ">out</span><span style="color: #000000; ">[</span><span style="color: #800000; font-weight: bold; ">sizeof</span><span style="color: #000000; ">(</span><span style="color: #000000; ">port</span><span style="color: #000000; ">)];
+        }
+        </span><span style="color: #000000; ">queue</span><span style="color: #000000; ">[</span><span style="color: #800000; font-weight: bold; ">sizeof</span><span style="color: #000000; ">(</span><span style="color: #000000; ">port</span><span style="color: #000000; ">)]: </span><span style="color: #000000; ">L2Queue</span><span style="color: #000000; "> {
+            </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #000000; ">:
+                </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; "> = </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">linkCapacity</span><span style="color: #000000; "> = </span><span style="color: #000000; ">linkCapacity</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">timeSlot</span><span style="color: #000000; "> = </span><span style="color: #000000; ">Slot_Duration</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; font-weight: bold; ">@display</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;p=80,200,row&quot;</span><span style="color: #000000; ">);
+        }
+    </span><span style="color: #800000; font-weight: bold; ">connections</span><span style="color: #000000; ">:
+        </span><span style="color: #000000; ">routing</span><span style="color: #000000; ">.</span><span style="color: #000000; ">localOut</span><span style="color: #000000; "> </span><span style="color: #800000; font-weight: bold; ">--&gt;</span><span style="color: #000000; "> </span><span style="color: #000000; ">app</span><span style="color: #000000; ">.</span><span style="color: #000000; ">in</span><span style="color: #000000; ">;
+        </span><span style="color: #000000; ">routing</span><span style="color: #000000; ">.</span><span style="color: #000000; ">localIn</span><span style="color: #000000; "> </span><span style="color: #800000; font-weight: bold; ">&lt;--</span><span style="color: #000000; "> </span><span style="color: #000000; ">app</span><span style="color: #000000; ">.</span><span style="color: #000000; ">out</span><span style="color: #000000; ">;
+        </span><span style="color: #800000; font-weight: bold; ">for</span><span style="color: #000000; "> </span><span style="color: #000000; ">i</span><span style="color: #000000; ">=</span><span style="color: #008000; ">0</span><span style="color: #000000; ">..</span><span style="color: #800000; font-weight: bold; ">sizeof</span><span style="color: #000000; ">(</span><span style="color: #000000; ">port</span><span style="color: #000000; ">)-</span><span style="color: #008000; ">1</span><span style="color: #000000; "> {
+            </span><span style="color: #000000; ">routing</span><span style="color: #000000; ">.</span><span style="color: #000000; ">out</span><span style="color: #000000; ">[</span><span style="color: #000000; ">i</span><span style="color: #000000; ">] </span><span style="color: #800000; font-weight: bold; ">--&gt;</span><span style="color: #000000; "> </span><span style="color: #000000; ">queue</span><span style="color: #000000; ">[</span><span style="color: #000000; ">i</span><span style="color: #000000; ">].</span><span style="color: #000000; ">in</span><span style="color: #000000; ">;
+            </span><span style="color: #000000; ">routing</span><span style="color: #000000; ">.</span><span style="color: #000000; ">in</span><span style="color: #000000; ">[</span><span style="color: #000000; ">i</span><span style="color: #000000; ">] </span><span style="color: #800000; font-weight: bold; ">&lt;--</span><span style="color: #000000; "> </span><span style="color: #000000; ">queue</span><span style="color: #000000; ">[</span><span style="color: #000000; ">i</span><span style="color: #000000; ">].</span><span style="color: #000000; ">out</span><span style="color: #000000; ">;
+            </span><span style="color: #000000; ">queue</span><span style="color: #000000; ">[</span><span style="color: #000000; ">i</span><span style="color: #000000; ">].</span><span style="color: #000000; ">line</span><span style="color: #000000; "> </span><span style="color: #800000; font-weight: bold; ">&lt;--&gt;</span><span style="color: #000000; "> </span><span style="color: #000000; ">port</span><span style="color: #000000; ">[</span><span style="color: #000000; ">i</span><span style="color: #000000; ">];
+        }
+}
+
+
+</span></pre>
+   <hr><p class="footer"><a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top"><img src="by-sa.png"></a> This documentation is released under the <a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top">Creative Commons license</a></p>
+   </body>
+</html>

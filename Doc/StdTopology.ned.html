@@ -1,0 +1,95 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+      <link rel="stylesheet" type="text/css" href="style.css" />
+   </head>
+   <body onload="if (top.frames['componentsframe'] == undefined) { s = window.location.toString(); window.location = 'index.html?p=' + s.substring(s.lastIndexOf('/')+1); }">
+<h2 class="comptitle">NED File <i>StdTopology.ned</i></h2>
+<h3 class="subtitle">Source code:</h3>
+<pre class="src"><span style="color: #808080; font-style: italic; ">////
+//// This file is part of an OMNeT++/OMNEST simulation example.
+////
+//// Copyright (C) 1992-2015 Andras Varga
+////
+//// This file is distributed WITHOUT ANY WARRANTY. See the file
+//// `license' for details on this and other legal matters.
+//
+//network StdTopology
+//{
+//    
+//    parameters:
+//        int number_of_nodes = default(8);
+//        int linkCapacityNode  @prompt(&quot;Enter the link capacity (packets/time-slot)&quot;);
+//        double packetSize  @prompt(&quot;Size of each packet (bytes)&quot;);
+//        int TotalnumberOfSlot @prompt(&quot;Enter the total time slots&quot;);
+//        int Traffic_Class @prompt(&quot;Traffic class: Press 1 for unicast only, 2 for broadcast only and 3 for both unicast and broadcast&quot;);
+//        double Slot_Duration @prompt(&quot;Enter the slot duration (in seconds)&quot;);
+//        double lambda @prompt(&quot;Enter the poisson arrival rate (lambda)&quot;);
+//        int source_node  @prompt(&quot;Enter the source node (for unicast and broadcast)&quot;);
+//        int destination_node @prompt(&quot;Enter the destination node (for unicast)&quot;);
+//        double min_key_Gen_rate  @prompt(&quot;Enter the minimum key generation rate(lambda) for any edge&quot;);
+//        double max_key_Gen_rate  @prompt(&quot;Enter the maximum key generation rate(lambda) for any edge&quot;);
+//        string trustProbabilities;
+//      types:
+//           channel packetPerSec extends ned.DatarateChannel {
+//	         delay = 25ms;// uniform(50,100)* pow(10,-6)*1s;
+//	         datarate = 0;// (linkCapacityNode*packetLengthNode*8)*(1bps);
+//	        } 
+//    submodules:
+//        
+//        networkController: networkTopoInfo
+//         {
+//        @display(&quot;i=block/cogwheel&quot;);
+//        packetLengtNetworkTopo = packetSize;
+//        linkCapacityNetworkTopo = linkCapacityNode;
+//        TotalnumberOfSlot = TotalnumberOfSlot;      
+//        timeSlot = Slot_Duration; 
+//        min_key_Gen_rate = min_key_Gen_rate;
+//    	max_key_Gen_rate = max_key_Gen_rate;   
+//    	trustProbabilities=trustProbabilities;
+//    	numOfNodes=number_of_nodes;        
+//         }
+//         
+//        node[8]: Node {
+//            parameters:
+//                //  @display(&quot;i=misc/node_vs,blue&quot;);
+//                  @display(&quot;p=100,100,ring&quot;);
+//                linkCapacity = linkCapacityNode;
+//                Traffic_Class = Traffic_Class;
+//                packetSize = packetSize;
+//                TotalnumberOfSlot = TotalnumberOfSlot;
+//                n = number_of_nodes;
+//                address = index;
+//                Slot_Duration = Slot_Duration;
+//                lambda = lambda;
+//                source_node = source_node;
+//                destination_node = destination_node;
+//                //               numOfNodes = n;
+//              
+//            gates:
+//                nodeIn[n];
+//                nodeOut[n];
+//        }
+//            
+//	connections allowunconnected:
+//      
+//            node[0].nodeOut[1] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[1].nodeIn[0];
+//            node[0].nodeOut[3] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[3].nodeIn[0];
+//            node[0].nodeOut[6] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[6].nodeIn[0];
+//           	node[1].nodeOut[3] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[3].nodeIn[1];
+//           	node[2].nodeOut[1] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[1].nodeIn[2];
+//           	node[3].nodeOut[4] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[4].nodeIn[3];
+//           	node[4].nodeOut[5] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[5].nodeIn[4];
+//   			node[4].nodeOut[2] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[2].nodeIn[4];
+//   			node[4].nodeOut[6] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[6].nodeIn[4];
+//   			node[5].nodeOut[7] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[7].nodeIn[5];
+//   			node[6].nodeOut[7] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[7].nodeIn[6];	
+//            node[7].nodeOut[2] --&gt; packetPerSec {@display(&quot;ls=green,1.1&quot;);}    --&gt; node[2].nodeIn[7];
+//      
+//}
+//
+//
+</span></pre>
+   <hr><p class="footer"><a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top"><img src="by-sa.png"></a> This documentation is released under the <a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top">Creative Commons license</a></p>
+   </body>
+</html>

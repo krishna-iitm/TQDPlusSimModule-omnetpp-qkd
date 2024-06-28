@@ -1,0 +1,108 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+      <link rel="stylesheet" type="text/css" href="style.css" />
+   </head>
+   <body onload="if (top.frames['componentsframe'] == undefined) { s = window.location.toString(); window.location = 'index.html?p=' + s.substring(s.lastIndexOf('/')+1); }">
+<h2 class="comptitle">NED File <i>RandomGraph.ned</i></h2>
+<table class="typestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="description">Description</th>
+   </tr>
+<tr>
+   <td>
+<a href="RandomGraph.html">RandomGraph</a>
+   </td>
+   <td>
+<i>network</i>
+   </td>
+   <td>
+
+<p>The whole network comprising of user nodes and links, controller</p>
+
+   </td>
+</tr>
+</table>
+<h3 class="subtitle">Source code:</h3>
+<pre class="src"><span style="color: #808080; font-style: italic; ">//
+// This file is part of an OMNeT++/OMNEST simulation example.
+//
+// Copyright (C) 1992-2015 Andras Varga
+//
+// This file is distributed WITHOUT ANY WARRANTY. See the file
+// `license' for details on this and other legal matters.
+</span><span style="color: #000000; ">
+</span><span style="color: #808080; font-style: italic; ">// The whole network comprising of user nodes and links, controller
+//
+</span><span style="color: #800000; font-weight: bold; ">network</span><span style="color: #000000; "> </span><span style="color: #000000; ">RandomGraph</span><span style="color: #000000; ">
+{
+    
+    </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #000000; ">:
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">number_of_nodes</span><span style="color: #000000; "> </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the number of nodes&quot;</span><span style="color: #000000; ">);</span><span style="color: #808080; font-style: italic; ">// = default(10);
+</span><span style="color: #000000; ">        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">linkCapacityNode</span><span style="color: #000000; ">  </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the link capacity (packets/time-slot)&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #000000; "> </span><span style="color: #000000; ">packetSize</span><span style="color: #000000; ">  </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Size of each packet (bytes)&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #000000; "> </span><span style="color: #000000; ">degreeOfConnectivity</span><span style="color: #000000; ">  </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the degree of connectivity among the nodes (between 0 to 1)&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; "> </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the total time slots&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">Traffic_Class</span><span style="color: #000000; "> </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Traffic class: Press 1 for unicast only, 2 for broadcast only and 3 for both unicast and broadcast&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #000000; "> </span><span style="color: #000000; ">Slot_Duration</span><span style="color: #000000; "> </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the slot duration (in seconds)&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #000000; "> </span><span style="color: #000000; ">lambda</span><span style="color: #000000; "> </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the poisson arrival rate (lambda)&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">source_node</span><span style="color: #000000; ">  </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the source node (for unicast and broadcast)&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #000000; "> </span><span style="color: #000000; ">destination_node</span><span style="color: #000000; "> </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the destination node (for unicast)&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #000000; "> </span><span style="color: #000000; ">min_key_Gen_rate</span><span style="color: #000000; ">  </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the minimum key generation rate(lambda) for any edge&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #000000; "> </span><span style="color: #000000; ">max_key_Gen_rate</span><span style="color: #000000; ">  </span><span style="color: #000000; font-weight: bold; ">@prompt</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;Enter the maximum key generation rate(lambda) for any edge&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000080; font-weight: bold; ">string</span><span style="color: #000000; "> </span><span style="color: #000000; ">trustProbabilities</span><span style="color: #000000; ">;
+      </span><span style="color: #800000; font-weight: bold; ">types</span><span style="color: #000000; ">:
+           </span><span style="color: #800000; font-weight: bold; ">channel</span><span style="color: #000000; "> </span><span style="color: #000000; ">packetPerSec</span><span style="color: #000000; "> </span><span style="color: #800000; font-weight: bold; ">extends</span><span style="color: #000000; "> </span><span style="color: #000000; ">ned</span><span style="color: #000000; ">.</span><span style="color: #000000; ">DatarateChannel</span><span style="color: #000000; "> {
+	         </span><span style="color: #000000; ">delay</span><span style="color: #000000; "> = </span><span style="color: #008000; ">25</span><span style="color: #000000; ">ms</span><span style="color: #000000; ">;</span><span style="color: #808080; font-style: italic; ">// uniform(50,100)* pow(10,-6)*1s;
+</span><span style="color: #000000; ">	         </span><span style="color: #000000; ">datarate</span><span style="color: #000000; "> = </span><span style="color: #008000; ">0</span><span style="color: #000000; ">;</span><span style="color: #808080; font-style: italic; ">// (linkCapacityNode*packetLengthNode*8)*(1bps);
+</span><span style="color: #000000; ">	        } 
+    </span><span style="color: #800000; font-weight: bold; ">submodules</span><span style="color: #000000; ">:
+        
+        </span><span style="color: #000000; ">networkController</span><span style="color: #000000; ">: </span><span style="color: #000000; ">networkTopoInfo</span><span style="color: #000000; ">
+         {
+        </span><span style="color: #000000; font-weight: bold; ">@display</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;i=block/cogwheel&quot;</span><span style="color: #000000; ">);
+        </span><span style="color: #000000; ">packetLengtNetworkTopo</span><span style="color: #000000; "> = </span><span style="color: #000000; ">packetSize</span><span style="color: #000000; ">;
+        </span><span style="color: #000000; ">linkCapacityNetworkTopo</span><span style="color: #000000; "> = </span><span style="color: #000000; ">linkCapacityNode</span><span style="color: #000000; ">;
+        </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; "> = </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; ">;      
+        </span><span style="color: #000000; ">timeSlot</span><span style="color: #000000; "> = </span><span style="color: #000000; ">Slot_Duration</span><span style="color: #000000; ">; 
+        </span><span style="color: #000000; ">min_key_Gen_rate</span><span style="color: #000000; "> = </span><span style="color: #000000; ">min_key_Gen_rate</span><span style="color: #000000; ">;
+    	</span><span style="color: #000000; ">max_key_Gen_rate</span><span style="color: #000000; "> = </span><span style="color: #000000; ">max_key_Gen_rate</span><span style="color: #000000; ">;   
+    	</span><span style="color: #000000; ">trustProbabilities</span><span style="color: #000000; ">=</span><span style="color: #000000; ">trustProbabilities</span><span style="color: #000000; ">;
+    	</span><span style="color: #000000; ">numOfNodes</span><span style="color: #000000; ">=</span><span style="color: #000000; ">number_of_nodes</span><span style="color: #000000; ">;        
+         }
+         
+        </span><span style="color: #000000; ">node</span><span style="color: #000000; ">[</span><span style="color: #000000; ">number_of_nodes</span><span style="color: #000000; ">]: </span><span style="color: #000000; ">Node</span><span style="color: #000000; "> {
+            </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #000000; ">:
+                </span><span style="color: #808080; font-style: italic; ">//  @display(&quot;i=misc/node_vs,blue&quot;);
+</span><span style="color: #000000; ">                  </span><span style="color: #000000; font-weight: bold; ">@display</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;p=100,100,ring&quot;</span><span style="color: #000000; ">);
+                </span><span style="color: #000000; ">linkCapacity</span><span style="color: #000000; "> = </span><span style="color: #000000; ">linkCapacityNode</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">Traffic_Class</span><span style="color: #000000; "> = </span><span style="color: #000000; ">Traffic_Class</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">packetSize</span><span style="color: #000000; "> = </span><span style="color: #000000; ">packetSize</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; "> = </span><span style="color: #000000; ">TotalnumberOfSlot</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">n</span><span style="color: #000000; "> = </span><span style="color: #000000; ">number_of_nodes</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">address</span><span style="color: #000000; "> = </span><span style="color: #800000; font-weight: bold; ">index</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">Slot_Duration</span><span style="color: #000000; "> = </span><span style="color: #000000; ">Slot_Duration</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">lambda</span><span style="color: #000000; "> = </span><span style="color: #000000; ">lambda</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">source_node</span><span style="color: #000000; "> = </span><span style="color: #000000; ">source_node</span><span style="color: #000000; ">;
+                </span><span style="color: #000000; ">destination_node</span><span style="color: #000000; "> = </span><span style="color: #000000; ">destination_node</span><span style="color: #000000; ">;
+                </span><span style="color: #808080; font-style: italic; ">//               numOfNodes = n;
+</span><span style="color: #000000; ">              
+            </span><span style="color: #800000; font-weight: bold; ">gates</span><span style="color: #000000; ">:
+                </span><span style="color: #000000; ">port</span><span style="color: #000000; ">[</span><span style="color: #000000; ">number_of_nodes</span><span style="color: #000000; ">];
+        }
+</span><span style="color: #808080; font-style: italic; ">//{delay = 0.1ms ; datarate = 1Gbps;}
+</span><span style="color: #000000; ">    </span><span style="color: #800000; font-weight: bold; ">connections</span><span style="color: #000000; "> </span><span style="color: #800000; font-weight: bold; ">allowunconnected</span><span style="color: #000000; ">:
+        </span><span style="color: #800000; font-weight: bold; ">for</span><span style="color: #000000; "> </span><span style="color: #000000; ">i</span><span style="color: #000000; ">=</span><span style="color: #008000; ">0</span><span style="color: #000000; ">..</span><span style="color: #000000; ">number_of_nodes</span><span style="color: #000000; ">-</span><span style="color: #008000; ">2</span><span style="color: #000000; ">, </span><span style="color: #800000; font-weight: bold; ">for</span><span style="color: #000000; "> </span><span style="color: #000000; ">j</span><span style="color: #000000; ">=</span><span style="color: #000000; ">i</span><span style="color: #000000; ">+</span><span style="color: #008000; ">1</span><span style="color: #000000; ">..</span><span style="color: #000000; ">number_of_nodes</span><span style="color: #000000; ">-</span><span style="color: #008000; ">1</span><span style="color: #000000; "> {
+            </span><span style="color: #000000; ">node</span><span style="color: #000000; ">[</span><span style="color: #000000; ">i</span><span style="color: #000000; ">].</span><span style="color: #000000; ">port</span><span style="color: #000000; ">[</span><span style="color: #000000; ">j</span><span style="color: #000000; ">] </span><span style="color: #800000; font-weight: bold; ">&lt;--&gt;</span><span style="color: #000000; "> </span><span style="color: #000000; ">packetPerSec</span><span style="color: #000000; "> {</span><span style="color: #000000; font-weight: bold; ">@display</span><span style="color: #000000; ">(</span><span style="color: #008000; ">&quot;ls=blackn,1.1&quot;</span><span style="color: #000000; ">);}    </span><span style="color: #800000; font-weight: bold; ">&lt;--&gt;</span><span style="color: #000000; "> </span><span style="color: #000000; ">node</span><span style="color: #000000; ">[</span><span style="color: #000000; ">j</span><span style="color: #000000; ">].</span><span style="color: #000000; ">port</span><span style="color: #000000; ">[</span><span style="color: #000000; ">i</span><span style="color: #000000; ">] </span><span style="color: #800000; font-weight: bold; ">if</span><span style="color: #000000; "> </span><span style="color: #800080; font-weight: bold; ">uniform</span><span style="color: #000000; ">(</span><span style="color: #008000; ">0</span><span style="color: #000000; ">,</span><span style="color: #008000; ">1</span><span style="color: #000000; ">)&lt;</span><span style="color: #000000; ">degreeOfConnectivity</span><span style="color: #000000; ">;
+           </span><span style="color: #808080; font-style: italic; ">//   node[i].port[j] &lt;--&gt; packetPerSec {@display(&quot;ls=green,2&quot;);}   &lt;--&gt; node[j].port[i];
+</span><span style="color: #000000; ">            
+        }
+}
+
+
+</span></pre>
+   <hr><p class="footer"><a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top"><img src="by-sa.png"></a> This documentation is released under the <a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top">Creative Commons license</a></p>
+   </body>
+</html>
