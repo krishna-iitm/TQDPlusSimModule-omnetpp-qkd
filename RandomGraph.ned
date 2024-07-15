@@ -22,9 +22,10 @@ network RandomGraph
         int destination_node @prompt("Enter the destination node (for unicast)");
         double min_key_Gen_rate  @prompt("Enter the minimum key generation rate(lambda) for any edge");
         double max_key_Gen_rate  @prompt("Enter the maximum key generation rate(lambda) for any edge");
+        string trustProbabilities;
       types:
            channel packetPerSec extends ned.DatarateChannel {
-	         delay = 20us;// uniform(50,100)* pow(10,-6)*1s;
+	         delay = 25ms;// uniform(50,100)* pow(10,-6)*1s;
 	         datarate = 0;// (linkCapacityNode*packetLengthNode*8)*(1bps);
 	        } 
     submodules:
@@ -37,7 +38,10 @@ network RandomGraph
         TotalnumberOfSlot = TotalnumberOfSlot;      
         timeSlot = Slot_Duration; 
         min_key_Gen_rate = min_key_Gen_rate;
-    	max_key_Gen_rate = max_key_Gen_rate;           
+    	max_key_Gen_rate = max_key_Gen_rate;   
+    	trustProbabilities=trustProbabilities;
+    	numOfNodes=number_of_nodes;
+    	lambda = lambda;        
          }
          
         node[number_of_nodes]: Node {
@@ -62,7 +66,7 @@ network RandomGraph
 //{delay = 0.1ms ; datarate = 1Gbps;}
     connections allowunconnected:
         for i=0..number_of_nodes-2, for j=i+1..number_of_nodes-1 {
-            node[i].port[j] <--> packetPerSec {@display("ls=blackn,1.1");}    <--> node[j].port[i] if uniform(0,1)<degreeOfConnectivity;
+            node[i].port[j] <--> packetPerSec {@display("ls=black,1.1");}    <--> node[j].port[i] if uniform(0,1)<degreeOfConnectivity;
            //   node[i].port[j] <--> packetPerSec {@display("ls=green,2");}   <--> node[j].port[i];
             
         }

@@ -18,9 +18,12 @@ packet Packet
     int hopCount @packetData;
     double size @packetData;
     int route[];
-    int arraySizeAndIndex = 1;
-    simtime_t queueDelayPerHop;
+    int arraySizeAndIndex = 1; //Keeps track of the packet traversal. 
+    //For example if the route is 1->6->4->5 and the packet is in node 6 then arraySizeAndIndex contains the position of the next node 4 (third in the route array) 
+    simtime_t TotalQueueDelay_X;
+    simtime_t TotalQueueDelay_Y;
     string packetName;
     int timeSlotCounter;
+    bool enableEncryption;
 }
 

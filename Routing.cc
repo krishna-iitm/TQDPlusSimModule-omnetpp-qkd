@@ -32,6 +32,8 @@ void Routing::initialize()
 
     timeSlotMsg = new cMessage("nextTimeSlotMsg");
     scheduleAt(timeSlot, timeSlotMsg);
+
+
 }
 
 void Routing::handleMessage(cMessage *msg)
@@ -53,7 +55,7 @@ void Routing::handleMessage(cMessage *msg)
         Packet *pk = check_and_cast<Packet *>(msg);
         if (pk->getSrcAddr() == myAddress)
         {
-            targetTopoInfo->updateVQforBroadcastTrafficArrivalAtSource();
+            targetTopoInfo->updateVQforBroadcastTrafficArrivalAtSource(); //Method call to NetworkController but Enter_Method() is not provided
             handleBroadCastTraffic(pk);
         }
         else
@@ -64,7 +66,7 @@ void Routing::handleMessage(cMessage *msg)
     {
         Packet *pk = check_and_cast<Packet *>(msg);
         int destAddr = pk->getDestAddr();
-
+//        EV<<"In Routing::handleMessage, Event:UnicastPacketInternalArrival"<<endl;
         if (destAddr == myAddress)
         {
             EV << "Delivery of packet " << pk->getPacketName() << " to node "<<myAddress<<endl;
@@ -78,9 +80,14 @@ void Routing::handleMessage(cMessage *msg)
             {
                 EV<<"Received unencrypted unicast packet in the routing module generated in time slot: "<<pk->getTimeSlotCounter()<<" from app of node "<<myAddress<<endl;
                 pk->setRouteArraySize(pk->getArraySizeAndIndex());
-                pk->setRoute((pk->getArraySizeAndIndex()-1), pk->getSrcAddr());
-                pk->setArraySizeAndIndex(pk->getArraySizeAndIndex()+1);
-                targetTopoInfo->updateVQonSrcArrvUnicastPacket(pk->getSrcAddr(), pk->getDestAddr(), dynamicRoutingTableUniCast, pk);
+                pk->setRoute((pk->getArraySizeAndIndex()-1), pk->getSrcAddr()); //Add source address at base index//arraySizeAndIndex-1 is to start from array base route[0]; set to route[index]=route(int value => node)
+                pk->setArraySizeAndIndex(pk->getArraySizeAndIndex()+1); // Increase temp variable arraySizeAndIndex
+
+                /* After the next line call to updateVQonSrcArrvUnicastPacket(), complete route information is written on packet->route and virtual queues are updated with the arrivals*/
+                targetTopoInfo->updateVQonSrcArrvUnicastPacket(pk->getSrcAddr(), pk->getDestAddr(), dynamicRoutingTableUniCast, pk, pk->getEnableEncryption());
+                targetTopoInfo->calcUtility(pk);
+                //To calculate the utilization of routes by TQD and TQD+
+                targetTopoInfo->updateRouteCount(pk);
                 pk->setHopCount(pk->getRouteArraySize()-1);
                 EV << "The selected route between "<<pk->getSrcAddr()<<" to "<<pk->getDestAddr()<<" is: ";
 
@@ -93,12 +100,13 @@ void Routing::handleMessage(cMessage *msg)
                 pk->setArraySizeAndIndex(1);
                 int outGateIndex = pk->getRoute((pk->getArraySizeAndIndex()));
                 pk->setArraySizeAndIndex(pk->getArraySizeAndIndex()+1);
-                EV<<"Unencrypted unicast packet is forwarded to Physical Queue X available in the module: "<<getParentModule()->getSubmodule("queue", outGateIndex)->getFullPath()<<endl;
+           //     EV<<"Unencrypted unicast packet is forwarded to Physical Queue X available in the module: "<<getParentModule()->getSubmodule("queue", outGateIndex)->getFullPath()<<endl;
                 send(pk, "out", outGateIndex);
             }
-            else
+            else //from other node through Routing.In, just push it to the next node's queue. This is required because the incoming queue's out gate is different from the next node's queue's out gate.
             {
-                EV<<"Received encryted packet to Node "<<myAddress<<" from Node "<<pk->getRoute((pk->getArraySizeAndIndex()-1))<<endl;
+
+                EV<<"Received encryted packet to Node "<<myAddress<<" from Node "<<pk->getRoute((pk->getArraySizeAndIndex()-2))<<endl;
                 int outGateIndex = pk->getRoute((pk->getArraySizeAndIndex()));
                 pk->setArraySizeAndIndex(pk->getArraySizeAndIndex()+1);
                 send(pk, "out", outGateIndex);
@@ -144,12 +152,12 @@ void Routing :: handleBroadCastTraffic(Packet *pk)
                 cGate *gate = linkout->getLocalGate();
                 if (gate->getIndex()!= tempInLinkGateIndex)
                 {
-                    EV<<" The copy of incoming packet is send to "<<linkout->getRemoteNode()->getModule()->getFullName()<<endl;
+           //         EV<<" The copy of incoming packet is send to "<<linkout->getRemoteNode()->getModule()->getFullName()<<endl;
                     send(pk->dup(), "out", gate->getIndex());
                 }
             }
         }
-        EV << "Original packet is forward to app of node "<<myAddress<<endl;
+     //   EV << "Original packet is forward to app of node "<<myAddress<<endl;
         send(pk, "localOut");
     }
     else

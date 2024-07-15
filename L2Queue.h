@@ -18,7 +18,7 @@ using namespace std;
 class L2Queue : public cSimpleModule
 {
   private:
-    long frameCapacity;
+    int QueueCapacity;
     int linkCapacity;
     int myAddress;
     cModule *targetModuleNetworkManager;
@@ -39,11 +39,13 @@ class L2Queue : public cSimpleModule
     cQueue queueForEncryptedPackets;
 
     //cArray uncryptedPacketArray;
-
-  //  simsignal_t qlenSignal;
+    simsignal_t qlenSignal;
+    simsignal_t xQlenSignal;
+    simsignal_t yQlenSignal;
+    simsignal_t sumQlenSignal;
 //    simsignal_t busySignal;
 //    simsignal_t queueingTimeSignal;
- //   simsignal_t dropSignal;
+    simsignal_t dropSignal;
 //    simsignal_t txBytesSignal;
 //    simsignal_t rxBytesSignal;
 

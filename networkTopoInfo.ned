@@ -23,8 +23,19 @@ simple networkTopoInfo
     int TotalnumberOfSlot;
     double min_key_Gen_rate;
     double max_key_Gen_rate;
-        
-      
+    int numOfNodes;
+    string trustProbabilities;
+    double lagrangeMultiplierV; //constant V: multiplier for the penalty
+    double lambda;
+    @signal[keyBankStatusWithStorage](type="long");
+    @signal[keyBankStatusWithoutStorage](type="long");
+    @signal[sumUtilitySignal](type="double");
+    //@signal[routeCountSignal]; // No type specified for a string signal
+    @statistic[keyBankStatusWithStorage](title="queue length";record=timeavg,max,mean,vector;interpolationmode=sample-hold);
+    @statistic[keyBankStatusWithoutStorage](title="queue length";record=timeavg,max,mean,vector;interpolationmode=sample-hold);
+    @statistic[sumNetworkUtility](source=sumUtilitySignal; title="sum over time, traffic class over";record=count,last);
+    //@statistic[routeCountStatistic](source=routeCountSignal; title="route count"; record=vector);
+    // Additional parameters
     gates:
       
 }

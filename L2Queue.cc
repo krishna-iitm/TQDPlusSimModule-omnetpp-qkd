@@ -37,15 +37,18 @@ void L2Queue::initialize()
 {
     targetModuleNetworkManager = getModuleByPath("RandomGraph.networkController");
     myAddress = getParentModule()->par("address");
+    QueueCapacity = par("QueueCapacity");
+//    EV<<"Queue capacity is: "<<QueueCapacity<<endl;
    // eventForVirtualQueueUpdate = new cMessage("virtualQueueUpdating");
     timeToUpdateVirtualQueue = 1;  // in second
  //   virtualQueueLength=1;
+    myAddress = getParentModule()->par("address");
     minLinkWeight = 1;
  //   WATCH(virtualQueueLength);
     timeSlot =  par("timeSlot");
     TotaltimeSlot = par("TotalnumberOfSlot");
     timeSlotCounter=0;
-    queue.setName("queue");
+//    queue.setName("queue");
     queueForUncryptedPackets.setName("queueForUncryptedPackets");
     queueForEncryptedPackets.setName("queueForEncryptedPackets");
 
@@ -53,17 +56,23 @@ void L2Queue::initialize()
 
     if (par("useCutThroughSwitching"))
         gate("line$i")->setDeliverOnReceptionStart(true);
+//        myAddress = getParentModule()->par("address");
 
-    frameCapacity = par("frameCapacity");
+ //   frameCapacity = par("frameCapacity");
     linkCapacity = par("linkCapacity");
 
-//      qlenSignal = registerSignal("qlen");
+/*Registering signals used in NED here to record statistics*/
+       xQlenSignal = registerSignal("xQlenSignal");
+       yQlenSignal = registerSignal("yQlenSignal");
+       qlenSignal = registerSignal("qlen");
+
 //    busySignal = registerSignal("busy");
  //     queueingTimeSignal = registerSignal("queueingTime");
- //     dropSignal = registerSignal("drop");
+       dropSignal = registerSignal("drop");
 //    txBytesSignal = registerSignal("txBytes");
 //    rxBytesSignal = registerSignal("rxBytes");
-  //    emit(qlenSignal, queue.getLength());
+       emit(xQlenSignal, queueForUncryptedPackets.getLength());
+       emit(yQlenSignal, queueForEncryptedPackets.getLength());
 //    emit(busySignal, false);
        isBusy = false;
  //   cGate *gate = gate("line");
@@ -102,8 +111,10 @@ void L2Queue::handleMessage(cMessage *msg)
         }
         else
             {
-                EV<<"Received the unencrypted broadcast packet to physical queue X generated in time slot "<<pk->getTimeSlotCounter()<<endl;
+      //          EV<<"Received the unencrypted broadcast packet to physical queue X generated in time slot "<<pk->getTimeSlotCounter()<<endl;
+                pk->setTimestamp();
                 queueForUncryptedPackets.insert(msg);
+
             }
 
     }
@@ -115,11 +126,32 @@ void L2Queue::handleMessage(cMessage *msg)
         {
             send(msg, "out");
         }
-        else
+
+        else if (pk->getEnableEncryption())
             {
-                EV<<"Received the unencrypted unicast packet to physical queue X generated in time slot "<<pk->getTimeSlotCounter()<<endl;
+               if(queueForUncryptedPackets.getLength()>= QueueCapacity)
+               {
+                   EV<<"queue is full. Droping the packet!"<<endl;
+                   emit(dropSignal, (long)check_and_cast<cPacket *>(msg)->getByteLength());
+                    delete pk;
+               }
+               else
+               {
+            EV<<"received packet in physical queue X\n";
+        //        EV<<"Received the unencrypted unicast packet to physical queue X generated in time slot "<<pk->getTimeSlotCounter()<<endl;
+                pk->setTimestamp();
                 queueForUncryptedPackets.insert(msg);
+                emit(qlenSignal, queueForUncryptedPackets.getLength());
+               }
             }
+
+        else
+        {
+            EV<<"received packet in physical queue Y directly\n"<<endl;
+            pk->setTimestamp();
+            queueForEncryptedPackets.insert(pk);
+        }
+
 
     }
 
@@ -134,20 +166,20 @@ void L2Queue::handleMessage(cMessage *msg)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
              keyStorageBank = targetTopoInfo->returnKeyStorageBank();
 
-             map<int, map<int, int> >::iterator itr6;
+//             map<int, map<int, int> >::iterator itr6;
             // For accessing inner map
-            map<int, int>::iterator ptr6;
-            EV << "\nKey storage Bank detail in Routing Module before encryption is"<<endl;
-            for (itr6 = keyStorageBank.begin(); itr6 != keyStorageBank.end(); itr6++) {
-
-                 for (ptr6 = itr6->second.begin(); ptr6 != itr6->second.end(); ptr6++) {
-
-                         EV << "Before: Available key between the node " <<itr6->first<< " and "<<ptr6->first<<" is "<< ptr6->second<<endl;
-                 }
-             }
+//            map<int, int>::iterator ptr6;
+//            EV << "\nKey storage Bank detail in Routing Module before encryption is"<<endl;
+//            for (itr6 = keyStorageBank.begin(); itr6 != keyStorageBank.end(); itr6++) {
+//
+//                 for (ptr6 = itr6->second.begin(); ptr6 != itr6->second.end(); ptr6++) {
+//
+//                         EV << "Before: Available key between the node " <<itr6->first<< " and "<<ptr6->first<<" is "<< ptr6->second<<endl;
+//                 }
+//             }
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            EV<<"\nNumber of packets in Physical Queue X before encryption between edge "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" are: "<<queueForUncryptedPackets.getLength()<<endl;
-            EV<<"\nkey available between the edge before encryption "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" is "<< keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()]<<endl;
+//            EV<<"\nNumber of packets in Physical Queue X before encryption between edge "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" are: "<<queueForUncryptedPackets.getLength()<<endl;
+//            EV<<"\nkey available between the edge before encryption "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" is "<< keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()]<<endl;
 
             int tempMinValueBetweenAvailableKeyAndPacketNumber = min(queueForUncryptedPackets.getLength(), keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()]);
             for (int i=0; i<tempMinValueBetweenAvailableKeyAndPacketNumber; i++)
@@ -155,19 +187,21 @@ void L2Queue::handleMessage(cMessage *msg)
              //  EV<<"\nKey available. Encryption begins!!!!\n";
                cObject *obj = (cMessage *)queueForUncryptedPackets.pop();
                Packet *pk = check_and_cast<Packet *>(obj);
-               EV << "Packet is encrypted with the available key and forwarded to physical queue Y !! and remaining key is : " << (keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()] - 1) <<endl;
+               pk->setTotalQueueDelay_X(pk->getTotalQueueDelay_X() + (simTime() - pk->getTimestamp()));
+ //              EV << "Packet is encrypted with the available key and forwarded to physical queue Y !! and remaining key is : " << (keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()] - 1) <<endl;
+               pk->setTimestamp();
                queueForEncryptedPackets.insert(pk);
-               EV<<"Received the Encrypted packets from physical queue X to physical queue Y"<<endl;
+//               EV<<"Received the Encrypted packets from physical queue X to physical queue Y"<<endl;
                keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()] = keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()] - 1;
                keyStorageBank[gate("line$o")->getNextGate()->getIndex()][myAddress] = keyStorageBank[gate("line$o")->getNextGate()->getIndex()][myAddress] - 1;
             }
 
             if (keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()]==0)
             {
-                EV<<"\nSorry no more keys are there for encryption!!\n";
-                EV<<"\nNumber of packets in Physical Queue X after encryption between edge "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" are: "<<queueForUncryptedPackets.getLength()<<endl;
-                EV<<"\nkey available between the edge after encryption "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" is "<< keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()]<<endl;
-                EV<<"\nNumber of packets in Physical Queue Y after encryption between edge "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" are: "<<queueForEncryptedPackets.getLength()<<endl;
+//                EV<<"\nSorry no more keys are there for encryption!!\n";
+//                EV<<"\nNumber of packets in Physical Queue X after encryption between edge "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" are: "<<queueForUncryptedPackets.getLength()<<endl;
+//                EV<<"\nkey available between the edge after encryption "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" is "<< keyStorageBank[myAddress][gate("line$o")->getNextGate()->getIndex()]<<endl;
+//                EV<<"\nNumber of packets in Physical Queue Y after encryption between edge "<<myAddress<<"--->"<<gate("line$o")->getNextGate()->getIndex()<<" are: "<<queueForEncryptedPackets.getLength()<<endl;
 
             }
 
@@ -181,12 +215,14 @@ void L2Queue::handleMessage(cMessage *msg)
             {
             cObject *obj = (cMessage *)queueForEncryptedPackets.pop();
             Packet *pk = check_and_cast<Packet *>(obj);
-            EV<<"Sending the encrypted packets generated in time slot: "<< pk->getTimeSlotCounter()<< "from physical queue Y to node: "<<gate("line$o")->getNextGate()->getIndex() <<endl;
+            pk->setTotalQueueDelay_Y(pk->getTotalQueueDelay_Y() + (simTime() - pk->getTimestamp()));
+     //       EV<<"Sending the encrypted packets generated in time slot: "<< pk->getTimeSlotCounter()<< "from physical queue Y to node: "<<gate("line$o")->getNextGate()->getIndex() <<endl;
             send(pk, "line$o");
             }
             }
 
-
+        emit(xQlenSignal, queueForUncryptedPackets.getLength());
+        emit(yQlenSignal, queueForEncryptedPackets.getLength());
         if (timeSlotCounter<TotaltimeSlot)
           {
             timeSlotCounter++;

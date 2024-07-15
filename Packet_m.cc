@@ -188,8 +188,10 @@ Packet::Packet(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
     route_arraysize = 0;
     this->route = 0;
     this->arraySizeAndIndex = 1;
-    this->queueDelayPerHop = 0;
+    this->TotalQueueDelay_X = 0;
+    this->TotalQueueDelay_Y = 0;
     this->timeSlotCounter = 0;
+    this->enableEncryption = false;
 }
 
 Packet::Packet(const Packet& other) : ::omnetpp::cPacket(other)
@@ -224,9 +226,11 @@ void Packet::copy(const Packet& other)
     for (unsigned int i=0; i<route_arraysize; i++)
         this->route[i] = other.route[i];
     this->arraySizeAndIndex = other.arraySizeAndIndex;
-    this->queueDelayPerHop = other.queueDelayPerHop;
+    this->TotalQueueDelay_X = other.TotalQueueDelay_X;
+    this->TotalQueueDelay_Y = other.TotalQueueDelay_Y;
     this->packetName = other.packetName;
     this->timeSlotCounter = other.timeSlotCounter;
+    this->enableEncryption = other.enableEncryption;
 }
 
 void Packet::parsimPack(omnetpp::cCommBuffer *b) const
@@ -239,9 +243,11 @@ void Packet::parsimPack(omnetpp::cCommBuffer *b) const
     b->pack(route_arraysize);
     doParsimArrayPacking(b,this->route,route_arraysize);
     doParsimPacking(b,this->arraySizeAndIndex);
-    doParsimPacking(b,this->queueDelayPerHop);
+    doParsimPacking(b,this->TotalQueueDelay_X);
+    doParsimPacking(b,this->TotalQueueDelay_Y);
     doParsimPacking(b,this->packetName);
     doParsimPacking(b,this->timeSlotCounter);
+    doParsimPacking(b,this->enableEncryption);
 }
 
 void Packet::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -260,9 +266,11 @@ void Packet::parsimUnpack(omnetpp::cCommBuffer *b)
         doParsimArrayUnpacking(b,this->route,route_arraysize);
     }
     doParsimUnpacking(b,this->arraySizeAndIndex);
-    doParsimUnpacking(b,this->queueDelayPerHop);
+    doParsimUnpacking(b,this->TotalQueueDelay_X);
+    doParsimUnpacking(b,this->TotalQueueDelay_Y);
     doParsimUnpacking(b,this->packetName);
     doParsimUnpacking(b,this->timeSlotCounter);
+    doParsimUnpacking(b,this->enableEncryption);
 }
 
 int Packet::getSrcAddr() const
@@ -345,14 +353,24 @@ void Packet::setArraySizeAndIndex(int arraySizeAndIndex)
     this->arraySizeAndIndex = arraySizeAndIndex;
 }
 
-::omnetpp::simtime_t Packet::getQueueDelayPerHop() const
+::omnetpp::simtime_t Packet::getTotalQueueDelay_X() const
 {
-    return this->queueDelayPerHop;
+    return this->TotalQueueDelay_X;
 }
 
-void Packet::setQueueDelayPerHop(::omnetpp::simtime_t queueDelayPerHop)
+void Packet::setTotalQueueDelay_X(::omnetpp::simtime_t TotalQueueDelay_X)
 {
-    this->queueDelayPerHop = queueDelayPerHop;
+    this->TotalQueueDelay_X = TotalQueueDelay_X;
+}
+
+::omnetpp::simtime_t Packet::getTotalQueueDelay_Y() const
+{
+    return this->TotalQueueDelay_Y;
+}
+
+void Packet::setTotalQueueDelay_Y(::omnetpp::simtime_t TotalQueueDelay_Y)
+{
+    this->TotalQueueDelay_Y = TotalQueueDelay_Y;
 }
 
 const char * Packet::getPacketName() const
@@ -373,6 +391,16 @@ int Packet::getTimeSlotCounter() const
 void Packet::setTimeSlotCounter(int timeSlotCounter)
 {
     this->timeSlotCounter = timeSlotCounter;
+}
+
+bool Packet::getEnableEncryption() const
+{
+    return this->enableEncryption;
+}
+
+void Packet::setEnableEncryption(bool enableEncryption)
+{
+    this->enableEncryption = enableEncryption;
 }
 
 class PacketDescriptor : public omnetpp::cClassDescriptor
@@ -440,7 +468,7 @@ const char *PacketDescriptor::getProperty(const char *propertyname) const
 int PacketDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 9+basedesc->getFieldCount() : 9;
+    return basedesc ? 11+basedesc->getFieldCount() : 11;
 }
 
 unsigned int PacketDescriptor::getFieldTypeFlags(int field) const
@@ -461,8 +489,10 @@ unsigned int PacketDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<9) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<11) ? fieldTypeFlags[field] : 0;
 }
 
 const char *PacketDescriptor::getFieldName(int field) const
@@ -480,11 +510,13 @@ const char *PacketDescriptor::getFieldName(int field) const
         "size",
         "route",
         "arraySizeAndIndex",
-        "queueDelayPerHop",
+        "TotalQueueDelay_X",
+        "TotalQueueDelay_Y",
         "packetName",
         "timeSlotCounter",
+        "enableEncryption",
     };
-    return (field>=0 && field<9) ? fieldNames[field] : nullptr;
+    return (field>=0 && field<11) ? fieldNames[field] : nullptr;
 }
 
 int PacketDescriptor::findField(const char *fieldName) const
@@ -497,9 +529,11 @@ int PacketDescriptor::findField(const char *fieldName) const
     if (fieldName[0]=='s' && strcmp(fieldName, "size")==0) return base+3;
     if (fieldName[0]=='r' && strcmp(fieldName, "route")==0) return base+4;
     if (fieldName[0]=='a' && strcmp(fieldName, "arraySizeAndIndex")==0) return base+5;
-    if (fieldName[0]=='q' && strcmp(fieldName, "queueDelayPerHop")==0) return base+6;
-    if (fieldName[0]=='p' && strcmp(fieldName, "packetName")==0) return base+7;
-    if (fieldName[0]=='t' && strcmp(fieldName, "timeSlotCounter")==0) return base+8;
+    if (fieldName[0]=='T' && strcmp(fieldName, "TotalQueueDelay_X")==0) return base+6;
+    if (fieldName[0]=='T' && strcmp(fieldName, "TotalQueueDelay_Y")==0) return base+7;
+    if (fieldName[0]=='p' && strcmp(fieldName, "packetName")==0) return base+8;
+    if (fieldName[0]=='t' && strcmp(fieldName, "timeSlotCounter")==0) return base+9;
+    if (fieldName[0]=='e' && strcmp(fieldName, "enableEncryption")==0) return base+10;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -519,10 +553,12 @@ const char *PacketDescriptor::getFieldTypeString(int field) const
         "int",
         "int",
         "simtime_t",
+        "simtime_t",
         "string",
         "int",
+        "bool",
     };
-    return (field>=0 && field<9) ? fieldTypeStrings[field] : nullptr;
+    return (field>=0 && field<11) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **PacketDescriptor::getFieldPropertyNames(int field) const
@@ -624,9 +660,11 @@ std::string PacketDescriptor::getFieldValueAsString(void *object, int field, int
         case 3: return double2string(pp->getSize());
         case 4: return long2string(pp->getRoute(i));
         case 5: return long2string(pp->getArraySizeAndIndex());
-        case 6: return simtime2string(pp->getQueueDelayPerHop());
-        case 7: return oppstring2string(pp->getPacketName());
-        case 8: return long2string(pp->getTimeSlotCounter());
+        case 6: return simtime2string(pp->getTotalQueueDelay_X());
+        case 7: return simtime2string(pp->getTotalQueueDelay_Y());
+        case 8: return oppstring2string(pp->getPacketName());
+        case 9: return long2string(pp->getTimeSlotCounter());
+        case 10: return bool2string(pp->getEnableEncryption());
         default: return "";
     }
 }
@@ -647,9 +685,11 @@ bool PacketDescriptor::setFieldValueAsString(void *object, int field, int i, con
         case 3: pp->setSize(string2double(value)); return true;
         case 4: pp->setRoute(i,string2long(value)); return true;
         case 5: pp->setArraySizeAndIndex(string2long(value)); return true;
-        case 6: pp->setQueueDelayPerHop(string2simtime(value)); return true;
-        case 7: pp->setPacketName((value)); return true;
-        case 8: pp->setTimeSlotCounter(string2long(value)); return true;
+        case 6: pp->setTotalQueueDelay_X(string2simtime(value)); return true;
+        case 7: pp->setTotalQueueDelay_Y(string2simtime(value)); return true;
+        case 8: pp->setPacketName((value)); return true;
+        case 9: pp->setTimeSlotCounter(string2long(value)); return true;
+        case 10: pp->setEnableEncryption(string2bool(value)); return true;
         default: return false;
     }
 }

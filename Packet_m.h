@@ -31,10 +31,13 @@
  *     int hopCount \@packetData;
  *     double size \@packetData;
  *     int route[];
- *     int arraySizeAndIndex = 1;
- *     simtime_t queueDelayPerHop;
+ *     int arraySizeAndIndex = 1; //Keeps track of the packet traversal. 
+ *     //For example if the route is 1->6->4->5 and the packet is in node 6 then arraySizeAndIndex contains the position of the next node 4 (third in the route array) 
+ *     simtime_t TotalQueueDelay_X;
+ *     simtime_t TotalQueueDelay_Y;
  *     string packetName;
  *     int timeSlotCounter;
+ *     bool enableEncryption;
  * }
  * </pre>
  */
@@ -48,9 +51,11 @@ class Packet : public ::omnetpp::cPacket
     int *route; // array ptr
     unsigned int route_arraysize;
     int arraySizeAndIndex;
-    ::omnetpp::simtime_t queueDelayPerHop;
+    ::omnetpp::simtime_t TotalQueueDelay_X;
+    ::omnetpp::simtime_t TotalQueueDelay_Y;
     ::omnetpp::opp_string packetName;
     int timeSlotCounter;
+    bool enableEncryption;
 
   private:
     void copy(const Packet& other);
@@ -83,12 +88,16 @@ class Packet : public ::omnetpp::cPacket
     virtual void setRoute(unsigned int k, int route);
     virtual int getArraySizeAndIndex() const;
     virtual void setArraySizeAndIndex(int arraySizeAndIndex);
-    virtual ::omnetpp::simtime_t getQueueDelayPerHop() const;
-    virtual void setQueueDelayPerHop(::omnetpp::simtime_t queueDelayPerHop);
+    virtual ::omnetpp::simtime_t getTotalQueueDelay_X() const;
+    virtual void setTotalQueueDelay_X(::omnetpp::simtime_t TotalQueueDelay_X);
+    virtual ::omnetpp::simtime_t getTotalQueueDelay_Y() const;
+    virtual void setTotalQueueDelay_Y(::omnetpp::simtime_t TotalQueueDelay_Y);
     virtual const char * getPacketName() const;
     virtual void setPacketName(const char * packetName);
     virtual int getTimeSlotCounter() const;
     virtual void setTimeSlotCounter(int timeSlotCounter);
+    virtual bool getEnableEncryption() const;
+    virtual void setEnableEncryption(bool enableEncryption);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const Packet& obj) {obj.parsimPack(b);}

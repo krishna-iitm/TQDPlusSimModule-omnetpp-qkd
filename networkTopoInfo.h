@@ -31,6 +31,8 @@ private:
     long** graphMstperSlot_Broadcast; /////////// Graph after finding the MST from the actual graph graphNetwork_MST
     long** graphForKeyBankStoragePerEdge;
     double** graphForlambdaPerEdge;
+    double** linkTrustWeightMatrix; //For storing -log(p_i) -log(p_j)
+
     int linkCapacity;
     int minLinkWeight;
     double packetLength;
@@ -39,7 +41,18 @@ private:
     double maxKeyGenerationRate;
     int timeSlotCounter;
     int TotaltimeSlot;
+    long keyInKeyBank;
+    double lagrangeMultiplierV;
+    vector<double> networkUtilityAtTime;
+    double sumNetworkUtility;
+    double class1TrafficUtility; //specific to a topology
+    double class2TrafficUtility; //specific to a topology
+
   cTopology *getTopoInfo;
+  simsignal_t keyBankStatusWithStorageSignal;
+  simsignal_t keyBankStatusWithoutStorageSignal;
+  simsignal_t sumUtilitySignal;
+  //simsignal_t routeCountSignal;// Signal for route counts
 
   vector<cTopology*> topoMstVector = {nullptr};
 
@@ -50,26 +63,30 @@ private:
   std::map<int, map<int, int> > keyStorageBank;
   std::map<int, map<int, int> > tempKeyStorageBank;
 
+  std::map<std::vector<int>, int> routeCounts;
+
 
   cMessage *virtualQueueUpdation;
 
   public:
     networkTopoInfo();
     virtual ~networkTopoInfo();
-   // long** read_adjency_graph_2();
+//    long** read_adjency_graph_2();
     void updateGraphByVirtualQueueLength();
     void updateGraphByVQs();
     void keyGenerationAndStoragePerSlot();
     virtual std::map<int, map<int, int> > rTableCalForUniCast(cModule *node, int nodeAddress, bool initializeCall);
-    void  updateVQonSrcArrvUnicastPacket(int srcAddr, int dstAddr, std::map<int, map<int, int> > tempRTable, Packet *pkt);
+    void  updateVQonSrcArrvUnicastPacket(int srcAddr, int dstAddr, std::map<int, map<int, int> > tempRTable, Packet *pkt, bool enableEncryption);
     void  updateVQforBroadcastTrafficArrivalAtSource();
     virtual std::map<int, map<int, int> > rTableCalForUniCast_2();
     std::map<int, map<int, int> > returnKeyStorageBank();
     virtual void findMstPerSlotFromAdjencyMatrix(); ////////// To find graphMstperSlot graph from graphNetwork_MST per slot
     virtual void topologyModificationPerSlotForBroadCast(int slotNumber);
-   int returnSlotCounterValue();
-  cTopology* returnTopologyObject(int temptimeSlotCounter);
+    int returnSlotCounterValue();
+    cTopology* returnTopologyObject(int temptimeSlotCounter);
     virtual void put_graph_weight_on_link();
+    void calcUtility(Packet *pkt);
+    void updateRouteCount(Packet *pk);
 
     double getPacketSize();
     int getNumberOfNodes();
@@ -77,7 +94,11 @@ private:
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    virtual void finish();
 
+  private:
+      std::ofstream routeLogFile;
+      std::string routeLogFileName;
 
 
 };
