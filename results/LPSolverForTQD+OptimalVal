@@ -1,0 +1,95 @@
+% Define the adjacency matrix
+a = [0, 1, 1, 0, 0, 1; 
+     1, 0, 0, 1, 0, 1; 
+     1, 0, 0, 1, 1, 1; 
+     0, 1, 1, 0, 1, 1; 
+     0, 0, 1, 1, 0, 0; 
+     1, 1, 1, 1, 0, 0];
+
+% % Define weights for edges (linear representation of the weighted adjacency matrix)
+% w_e_linear = [0, 1.0739, 1.0739, 0, 0, 1.0739, 1.0739, 0, 0, 2.0, 0, 2.0, 1.0739, 0, 0, 2.0, 2.0, 2.0, 0, 2.0, 2.0, 0, 2.0, 2.0, 0, 0, 2.0, 2.0, 0, 0, 1.0739, 2.0, 2.0, 2.0, 0, 0];
+% w_e = reshape(w_e_linear, size(a));
+p_n = [0, 0, 0, 0, 0, 0];
+for k=0:0.1:0.9
+p_n(1)=k;
+w=zeros(size(a));
+for i=1:length(p_n)
+    % disp(i);
+    for j=1:size(a,1)
+        w(i,j) = a(i,j)* (log(1-p_n(i)) + log(1-p_n(j)));
+        % disp(j);
+    end
+end
+w_e=w;
+
+% Define source and destination
+s = 2; % source node
+t = 5; % destination node
+
+% Define total flow
+x = 1.2;
+
+% Define edge capacity
+c_e = 0.6;
+
+% Create graph object
+G = graph(a);
+
+% Find all paths from source to destination
+all_paths = allpaths(G, s, t);
+
+% Number of paths
+num_paths = length(all_paths);
+
+% Initialize the optimization problem
+f = zeros(num_paths, 1); % Objective function coefficients
+Aeq = ones(1, num_paths); % Equality constraint coefficients
+beq = x; % Equality constraint value
+
+% Determine the number of edges
+num_edges = sum(sum(triu(a)));
+
+% Inequality constraint coefficients and values
+A = zeros(num_edges, num_paths); % To be filled with paths containing edges
+b = c_e * ones(num_edges, 1);
+
+% Fill in the objective function coefficients
+for i = 1:num_paths
+    path = all_paths{i};
+    for j = 1:length(path)-1
+        edge = findedge(G, path(j), path(j+1));
+        f(i) = f(i) + w_e(path(j), path(j+1));
+    end
+end
+
+% Fill in the inequality constraint matrix A
+edge_counter = 0;
+for u = 1:size(a, 1)
+    for v = u+1:size(a, 2)
+        if a(u, v) == 1
+            edge_counter = edge_counter + 1;
+            for i = 1:num_paths
+                path = all_paths{i};
+                % Create a list of edges in the current path
+                path_edges = [path(1:end-1)' path(2:end)'];
+                % Check if the current edge [u, v] is in the list of edges in the path
+                if any(ismember(path_edges, [u, v], 'rows')) || any(ismember(path_edges, [v, u], 'rows'))
+                    A(edge_counter, i) = 1;
+                end
+            end
+        end
+    end
+end
+
+% Solve the linear program
+options = optimoptions('linprog', 'Display', 'off');
+[x_opt, fval] = linprog(-f, A, b, Aeq, beq, zeros(num_paths, 1), [], options);
+
+% Display the results
+% disp('Optimal flow distribution along paths:');
+% disp(x_opt);
+% disp('Maximum objective function value:');
+% disp(-fval);
+disp(nonzeros(x_opt));
+disp(all_paths(find(x_opt)));
+end
